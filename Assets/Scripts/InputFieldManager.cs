@@ -35,4 +35,17 @@ public class InputFieldManager : MonoBehaviour
       inputFields.ActivateInputField();
     }
   }
+
+  public void DeleteTask(int index)
+  {
+    if (index < 0 || index >= clickCount) return;
+    for (int i = index; i < clickCount - 1; i++)
+    {
+      texts[i].text = texts[i + 1].text;
+    }
+    
+    texts[clickCount - 1].text = "";
+    clickCount--;
+    editingIndex = -1;
+  }
 }
