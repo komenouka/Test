@@ -31,6 +31,9 @@ public class TodoView : MonoBehaviour
         });
         _model.OnDataChanged += RenderList;
         RenderList();
+
+
+        Debug.Log("Todo list initialized.");
     }
 
     private void ClearInputs()
