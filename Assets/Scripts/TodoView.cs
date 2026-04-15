@@ -65,7 +65,7 @@ public class TodoView : MonoBehaviour
     {
         var d = _model.List[idx];
         inName.text = d.Name; inLimit.text = d.Limit; inOwner.text = d.Owner;
-     if (submitTxt != null) submitTxt.text = "Update";
-      _ctlr.StartEdit(idx);
+        if (submitTxt != null) submitTxt.text = "Update";
+        _ctlr.StartEdit(idx);
     }
 }
