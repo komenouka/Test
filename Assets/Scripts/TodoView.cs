@@ -22,6 +22,7 @@ public class TodoView : MonoBehaviour
         if (submitBtn != null) submitBtn.onClick.AddListener(OnSubmit);
 
         Refresh();
+        Debug.Log("TodoView initialized.");
     }
 
     void OnSubmit()
