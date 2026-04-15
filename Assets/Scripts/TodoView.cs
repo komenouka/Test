@@ -4,67 +4,67 @@ using TMPro;
 
 public class TodoView : MonoBehaviour
 {
-    [SerializeField] private TMP_InputField inputName;
-    [SerializeField] private TMP_InputField inputLimit;
-    [SerializeField] private TMP_InputField inputOwner;
-    [SerializeField] private Button submitButton;
-    [SerializeField] private TextMeshProUGUI submitButtonText;
-    [SerializeField] private TextMeshProUGUI[] taskFields;
-    [SerializeField] private TextMeshProUGUI[] ownerFields;
-    [SerializeField] private TextMeshProUGUI[] limitFields;
-    [SerializeField] private Button[] SubmitButtons;
-    [SerializeField] private Button[] deleteButtons;
+    [SerializeField] private TMP_InputField inName, inLimit, inOwner;
+    [SerializeField] private Button submitBtn;
+    [SerializeField] private TextMeshProUGUI submitTxt;
+    [SerializeField] private TextMeshProUGUI[] labels; 
+    [SerializeField] private Button[] editBtns, delBtns;
 
     private TodoModel _model;
-    private TodoController _controller;
+    private TodoController _ctlr;
 
     void Awake()
     {
         _model = new TodoModel();
-        _controller = new TodoController(_model);
-        submitButton.onClick.AddListener(() => {
-        _controller.ExecuteSubmit(inputName.text, inputLimit.text, inputOwner.text);
-        ClearInputs();
-        inputName.text = "";
-        inputLimit.text = "";
-        inputOwner.text = "";
-        });
-        _model.OnDataChanged += RenderList;
-        RenderList();
+        _ctlr = new TodoController(_model);
 
+        _model.OnChanged += Refresh;
+        if (submitBtn != null) submitBtn.onClick.AddListener(OnSubmit);
 
-        Debug.Log("Todo list initialized.");
+        Refresh();
     }
 
-    private void ClearInputs()
+    void OnSubmit()
     {
-        inputName.text = "";
-        inputLimit.text = "";
-        inputOwner.text = "";
-        if (submitButtonText != null) submitButtonText.text = "Submit";
+        var data = new TaskData { Name = inName.text, Limit = inLimit.text, Owner = inOwner.text };
+        _ctlr.ExecuteSave(data);
+
+        inName.text = inLimit.text = inOwner.text = "";
+        if (submitTxt != null) submitTxt.text = "Submit";
     }
-    private void RenderList()
-     {
-        for (int i = 0; i < taskFields.Length; i++)
+
+    void Refresh()
+    {
+        for (int i = 0; i < labels.Length; i++)
         {
-            if(taskFields[i] == null) continue;
-            if (i < _model.TodoList.Count)
+            if (labels[i] == null) continue;
+
+            bool hasData = i < _model.List.Count;
+             int idx = i;
+
+             labels[i].text = hasData ? _model.List[i].GetText() : "-";
+
+            if (i < delBtns.Length && delBtns[i] != null) 
             {
-                 TaskData data = _model.TodoList[i];
-                 taskFields[i].text = $"[{data.Limit}] {data.Owner} : {data.Name}";
+                delBtns[i].onClick.RemoveAllListeners();
+                if (hasData) delBtns[i].onClick.AddListener(() => _ctlr.ExecuteDelete(idx));
+                delBtns[i].gameObject.SetActive(hasData);
             }
-            else
+
+            if (i < editBtns.Length && editBtns[i] != null) 
             {
-            taskFields[i].text = "No Task";
-            }
-            if (i < deleteButtons.Length)
-            {
-                int index = i;
-                deleteButtons[i].onClick.RemoveAllListeners();
-                deleteButtons[i].onClick.AddListener(() => _controller.ExecuteDelete(index));
-                deleteButtons[i].gameObject.SetActive(i < _model.TodoList.Count);
+                editBtns[i].onClick.RemoveAllListeners();
+                if (hasData) editBtns[i].onClick.AddListener(() => SetEditMode(idx));
+                editBtns[i].gameObject.SetActive(hasData);
             }
         }
     }
-}
 
+    void SetEditMode(int idx)
+    {
+        var d = _model.List[idx];
+        inName.text = d.Name; inLimit.text = d.Limit; inOwner.text = d.Owner;
+     if (submitTxt != null) submitTxt.text = "Update";
+      _ctlr.StartEdit(idx);
+    }
+}
