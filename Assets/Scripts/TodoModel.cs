@@ -7,7 +7,7 @@ public class TodoModel
     public IReadOnlyList<TaskData> List => _list;
     public event Action OnChanged;
 
-    public void Save(int index, TaskData data)
+    public void SaveTask(int index, TaskData data)
     {
         if (string.IsNullOrWhiteSpace(data?.Name)) return;
 
@@ -17,7 +17,7 @@ public class TodoModel
         OnChanged?.Invoke();
     }
 
-    public void Delete(int index)
+    public void DeleteTask(int index)
     {
         if (index >= 0 && index < _list.Count)
         {

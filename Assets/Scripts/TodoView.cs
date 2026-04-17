@@ -4,68 +4,114 @@ using TMPro;
 
 public class TodoView : MonoBehaviour
 {
-    [SerializeField] private TMP_InputField inName, inLimit, inOwner;
-    [SerializeField] private Button submitBtn;
-    [SerializeField] private TextMeshProUGUI submitTxt;
-    [SerializeField] private TextMeshProUGUI[] labels; 
-    [SerializeField] private Button[] editBtns, delBtns;
+    [SerializeField] private TMP_InputField inName;
+    [SerializeField] private Button editButton;
+    [SerializeField] private TextMeshProUGUI submitText;
+    [SerializeField] private TextMeshProUGUI errorText;
+
+    [SerializeField] private TextMeshProUGUI[] names;
+    [SerializeField] private TMP_InputField[] rowOwnerInputs;
+    [SerializeField] private TMP_InputField[] rowLimitInputs;
+    [SerializeField] private Button[] EditButtons;
+    [SerializeField] private Button[] deleteButtons;
 
     private TodoModel _model;
-    private TodoController _ctlr;
+    private TodoController _controller;
 
-    void Awake()
+    public void Awake()
     {
         _model = new TodoModel();
-        _ctlr = new TodoController(_model);
+        _controller = new TodoController(_model);
 
-        _model.OnChanged += Refresh;
-        if (submitBtn != null) submitBtn.onClick.AddListener(OnSubmit);
+        _model.OnChanged += UpdateTasks;
+        _controller.OnValidationError += ShowError;
 
-        Refresh();
-        Debug.Log("TodoView initialized.");
+        if (editButton != null) editButton.onClick.AddListener(OnEditTasks);
+
+        UpdateTasks();
+        if (errorText != null) errorText.text = "";
     }
 
-    void OnSubmit()
+    public void OnEditTasks()
     {
-        var data = new TaskData { Name = inName.text, Limit = inLimit.text, Owner = inOwner.text };
-        _ctlr.ExecuteSave(data);
+        if (errorText != null) errorText.text = "";
+        
+        TaskData data = new TaskData { Name = inName.text };
+        _controller.SaveTask(data);
 
-        inName.text = inLimit.text = inOwner.text = "";
-        if (submitTxt != null) submitTxt.text = "Submit";
-    }
-
-    void Refresh()
-    {
-        for (int i = 0; i < labels.Length; i++)
+        if (string.IsNullOrEmpty(errorText.text))
         {
-            if (labels[i] == null) continue;
-
-            bool hasData = i < _model.List.Count;
-             int idx = i;
-
-             labels[i].text = hasData ? _model.List[i].GetText() : "-";
-
-            if (i < delBtns.Length && delBtns[i] != null) 
-            {
-                delBtns[i].onClick.RemoveAllListeners();
-                if (hasData) delBtns[i].onClick.AddListener(() => _ctlr.ExecuteDelete(idx));
-                delBtns[i].gameObject.SetActive(hasData);
-            }
-
-            if (i < editBtns.Length && editBtns[i] != null) 
-            {
-                editBtns[i].onClick.RemoveAllListeners();
-                if (hasData) editBtns[i].onClick.AddListener(() => SetEditMode(idx));
-                editBtns[i].gameObject.SetActive(hasData);
-            }
+            inName.text = "";
+            if (submitText != null) submitText.text = "Edit";
         }
     }
 
-    void SetEditMode(int idx)
+
+    public void UpdateTasks()
     {
-        var d = _model.List[idx];
-        inName.text = d.Name; inLimit.text = d.Limit; inOwner.text = d.Owner;
-        if (submitTxt != null) submitTxt.text = "Update";
-        _ctlr.StartEdit(idx);
+        for (int index = 0; index < names.Length; index++)
+        {
+            if (names[index] == null) continue;
+
+            UpdateTaskRow(index);    
+        }
+    }
+
+    public void UpdateTaskRow(int index)
+    {
+        bool hasData = index < _model.List.Count;
+
+        if (hasData)
+        {
+            var task = _model.List[index];
+            names[index].text = task.Name;
+
+            if (string.IsNullOrEmpty(rowOwnerInputs[index].text)) rowOwnerInputs[index].text = task.Owner;
+            if (string.IsNullOrEmpty(rowLimitInputs[index].text)) rowLimitInputs[index].text = task.Limit;
+        }
+        else
+        {
+            names[index].text = "";
+            rowOwnerInputs[index].text = "";
+            rowLimitInputs[index].text = "";
+        }
+
+        SetRowActive(index, hasData);
+    }
+
+    public void SetEditMode(int targetIndex)
+    {
+        TaskData taskToEdit = _model.List[targetIndex];
+        inName.text = taskToEdit.Name; 
+
+        if (submitText != null) submitText.text = "Update";
+        _controller.StartEdit(targetIndex);
+    }
+
+    public void SetRowActive(int index, bool isActive)
+    {
+        rowOwnerInputs[index].gameObject.SetActive(isActive);
+        rowLimitInputs[index].gameObject.SetActive(isActive);
+
+        ConfigureButton(EditButtons[index], isActive, () => SetEditMode(index));
+        ConfigureButton(deleteButtons[index], isActive, () => _controller.DeleteTask(index));
+    }
+
+    public void ConfigureButton(Button button, bool isActive, UnityEngine.Events.UnityAction action)
+    {
+        if (button == null) return;
+
+        button.gameObject.SetActive(isActive);
+        button.onClick.RemoveAllListeners();
+        if (isActive) button.onClick.AddListener(action);
+    }
+
+    public void ShowError(string message)
+    {
+        if (errorText != null)
+        {
+            errorText.text = message;
+            errorText.color = Color.red;
+        }
     }
 }

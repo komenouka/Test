@@ -1,20 +1,20 @@
 using UnityEngine;
-using TMPro;
 using UnityEngine.UI;
+using TMPro;
 
 public class TaskItemView : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI taskLabel;
-    [SerializeField] private Button editBtn, delBtn;
+    [SerializeField] private TextMeshProUGUI taskName;
+    [SerializeField] private Button editButton, deleteButton;
 
-    public void Setup(int idx, TaskData data, System.Action<int> onEdit, System.Action<int> onDelete)
+    public void Setup(int index, TaskData data, System.Action<int> onEdit, System.Action<int> onDelete)
     {
-        if (taskLabel != null) taskLabel.text = data.GetText();
+        if (taskName != null) taskName.text = data.ToString();
         
-        editBtn.onClick.RemoveAllListeners();
-        editBtn.onClick.AddListener(() => onEdit(idx));
+        editButton.onClick.RemoveAllListeners();
+        editButton.onClick.AddListener(() => onEdit(index));
         
-        delBtn.onClick.RemoveAllListeners();
-        delBtn.onClick.AddListener(() => onDelete(idx));
+        deleteButton.onClick.RemoveAllListeners();
+        deleteButton.onClick.AddListener(() => onDelete(index));
     }
 }
