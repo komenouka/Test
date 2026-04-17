@@ -6,7 +6,7 @@ public class TodoView : MonoBehaviour
 {
     [SerializeField] private TMP_InputField inName;
     [SerializeField] private Button editButton;
-    [SerializeField] private TextMeshProUGUI submitText;
+    [SerializeField] private TextMeshProUGUI editText;
     [SerializeField] private TextMeshProUGUI errorText;
 
     [SerializeField] private TextMeshProUGUI[] names;
@@ -42,7 +42,7 @@ public class TodoView : MonoBehaviour
         if (string.IsNullOrEmpty(errorText.text))
         {
             inName.text = "";
-            if (submitText != null) submitText.text = "Edit";
+            if (editText != null) editText.text = "Edit";
         }
     }
 
@@ -84,7 +84,7 @@ public class TodoView : MonoBehaviour
         TaskData taskToEdit = _model.List[targetIndex];
         inName.text = taskToEdit.Name; 
 
-        if (submitText != null) submitText.text = "Update";
+        if (editText != null) editText.text = "Update";
         _controller.StartEdit(targetIndex);
     }
 

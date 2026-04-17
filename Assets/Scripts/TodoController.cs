@@ -14,7 +14,7 @@ public class TodoController
     {
         if (string.IsNullOrWhiteSpace(newTaskData.Name))
         {
-            OnValidationError?.Invoke("Error: No TaskName! ");
+            OnValidationError?.Invoke("Error: No TaskName!");
             return;
         }
 
