@@ -4,22 +4,17 @@ using TMPro;
 
 public class TaskItemView : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI taskNameText;
-    [SerializeField] private TMP_InputField ownerInput;
-    [SerializeField] private TMP_InputField limitInput;
-    [SerializeField] private Button editButton;
-    [SerializeField] private Button deleteButton;
+    [SerializeField] private TextMeshProUGUI taskName;
+    [SerializeField] private Button editButton, deleteButton;
 
-    public void Setup(TaskData data, System.Action onEdit, System.Action onDelete)
+    public void Setup(int index, TaskData data, System.Action<int> onEdit, System.Action<int> onDelete)
     {
-        taskNameText.text = data.Name;
-        ownerInput.text = data.Owner;
-        limitInput.text = data.Limit;
+        if (taskName != null) taskName.text = data.ToString();
         
         editButton.onClick.RemoveAllListeners();
-        editButton.onClick.AddListener(() => onEdit?.Invoke());
+        editButton.onClick.AddListener(() => onEdit(index));
         
         deleteButton.onClick.RemoveAllListeners();
-        deleteButton.onClick.AddListener(() => onDelete?.Invoke());
+        deleteButton.onClick.AddListener(() => onDelete(index));
     }
 }

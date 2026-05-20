@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections.Generic;
 using UnityEngine.UI;
 using TMPro;
 
@@ -54,9 +53,7 @@ public class TodoView : MonoBehaviour
         {
             if (names[index] == null) continue;
 
-            bool hasData = index < _model.List.Count;
-            UpdateTaskRow(index);
-            SetRowActive(index, hasData);  
+            UpdateTaskRow(index);    
         }
     }
 
@@ -66,26 +63,20 @@ public class TodoView : MonoBehaviour
 
         if (hasData)
         {
-            TaskData task = _model.List[index];
+            var task = _model.List[index];
             names[index].text = task.Name;
 
-            if (string.IsNullOrEmpty(rowOwnerInputs[index].text))
-            {
-                rowOwnerInputs[index].text = task.Owner;
-            }
-
-            if (string.IsNullOrEmpty(rowLimitInputs[index].text))
-            {
-                rowLimitInputs[index].text = task.Limit;
-            }
+            if (string.IsNullOrEmpty(rowOwnerInputs[index].text)) rowOwnerInputs[index].text = task.Owner;
+            if (string.IsNullOrEmpty(rowLimitInputs[index].text)) rowLimitInputs[index].text = task.Limit;
         }
         else
         {
-            names[index].text = "No Task";
-        
+            names[index].text = "";
             rowOwnerInputs[index].text = "";
             rowLimitInputs[index].text = "";
         }
+
+        SetRowActive(index, hasData);
     }
 
     public void SetEditMode(int targetIndex)

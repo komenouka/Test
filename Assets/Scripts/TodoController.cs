@@ -18,7 +18,16 @@ public class TodoController
             return;
         }
 
-        _model.SaveTask(EditIndex, newTaskData);
+        if (EditIndex >= 0 && EditIndex < _model.List.Count)
+        {
+            TaskData existingTaskData = _model.List[EditIndex];
+            existingTaskData.Name = newTaskData.Name;
+            _model.SaveTask(EditIndex, existingTaskData);
+        }
+        else
+        {
+            _model.SaveTask(-1, newTaskData);
+        }
 
         EditIndex = -1;
     }
