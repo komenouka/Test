@@ -1,46 +1,40 @@
-using UnityEngine;
+using System;
 
 public class TodoController
 {
     private readonly TodoModel _model;
-    private int _editingIndex = -1;
+    public int EditIndex { get; private set; } = -1;
+    public event Action<string> OnValidationError;
 
-    public TodoController(TodoModel model)
+    public TodoController(TodoModel model) => _model = model;
+
+    public void StartEdit(int index) => EditIndex = index;
+
+    public void SaveTask(TaskData newTaskData)
     {
-        _model = model;
-    }
-    public bool IsEditing => _editingIndex != -1;
-    public void ExecuteSubmit(string name, string limit, string owner)    
-    {
-        if (string.IsNullOrWhiteSpace(name)) return;
-        if (IsEditing)
+        if (string.IsNullOrWhiteSpace(newTaskData.Name))
         {
-            _model.UpdateTodo(_editingIndex, name, limit, owner);
-            _editingIndex = -1;
+            OnValidationError?.Invoke("Error: No TaskName!");
+            return;
+        }
+
+        if (EditIndex >= 0 && EditIndex < _model.List.Count)
+        {
+            TaskData existingTaskData = _model.List[EditIndex];
+            existingTaskData.Name = newTaskData.Name;
+            _model.SaveTask(EditIndex, existingTaskData);
         }
         else
         {
-            _model.AddTask(name, limit, owner);
+            _model.SaveTask(-1, newTaskData);
         }
-    }
-    public void ExecuteUpdate(int index, string name, string limit, string owner)
-    {
-        if(_editingIndex >= 0)
-        {
-            _model.UpdateTodo(_editingIndex, name, limit, owner);
-            _editingIndex = -1;
-        }
-    }
-    public void ExecuteDelete(int index)
-    {
-        _model.DeleteTodo(index);
-        if (_editingIndex == index) _editingIndex = -1;
+
+        EditIndex = -1;
     }
 
- public TaskData GetEditingData()
+    public void DeleteTask(int index)
     {
-        if (IsEditing && _editingIndex < _model.TodoList.Count)
-        return _model.TodoList[_editingIndex];
-        return null;
+        _model.DeleteTask(index);
+        if (EditIndex == index) EditIndex = -1;
     }
 }

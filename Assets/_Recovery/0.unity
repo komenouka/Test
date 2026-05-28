@@ -2692,13 +2692,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TodoView
   inName: {fileID: 1972001840}
-  submitBtn: {fileID: 1516431166}
-  submitText: {fileID: 1514803457}
+  editButton: {fileID: 0}
+  editText: {fileID: 0}
   errorText: {fileID: 553690839}
-  labels:
-  - {fileID: 1708421073}
-  - {fileID: 253353282}
-  - {fileID: 731677989}
+  names: []
   rowOwnerInputs:
   - {fileID: 941163874}
   - {fileID: 641272125}
@@ -2707,11 +2704,11 @@ MonoBehaviour:
   - {fileID: 1791110555}
   - {fileID: 614046491}
   - {fileID: 139395316}
-  editBtns:
+  EditButtons:
   - {fileID: 1051324678}
   - {fileID: 1994177976}
   - {fileID: 1626830155}
-  delBtns:
+  deleteButtons:
   - {fileID: 1046878364}
   - {fileID: 850654932}
   - {fileID: 1991182733}
